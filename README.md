@@ -2,10 +2,10 @@ In Microsoft Word, to update all references and cross references, typically peop
 
 The purpose of this VBA Macro is to update all of these automatically at a single press of a button without a single window like this poping up. Specifically, it updates all of the following:
 
-- All caption labels (equations, figures and tables by default, but also custom)
+- All Caption Labels (equations, figures and tables by default, but also custom)
 - All Cross-References, including of the above caption labels, but also of headings
 - All References
-- All TOCs and Tables of caption labels
+- All TOCs, Tables of caption labels and Table of References/Bibliography
 
 ```VBA
 Sub UpdateAll()
