@@ -32,5 +32,11 @@ Sub UpdateAll()
     ' Re-enable screen updating and events
     Application.ScreenUpdating = True
 End Sub
-
 ```
+
+Steps to put this macro in Word:
+1) Open the 'Microsoft Visual Basic for Applications' window by pressing Alt+F11 OR click on 'Developer' tab -> 'Visual Basic' under 'Code' -> click on 'Insert' -> 'Module' -> copy the above program and paste into this module -> Save by pressing Ctrl+S OR Click on the Save icon 💾
+2) Run it to check it works by pressing F5 OR clicking on the Run icon ►
+3) Add this macro to the Quick Access Toolbar: click on 'File' -> 'Options' -> 'Quick Access Toolbar' -> '<ins>C</ins>hoose commands from:' -> 'Macros' -> click on the macro you created -> '<ins>A</ins>dd >>' -> click on this macro that you just added to the right -> '<ins>M</ins>odify...' -> Pick a nice name and icon, I like 'UpdateAll' and the Run icon ▷ -> OK & OK
+
+Now by simply clicking on this icon at the top left on your screen runs this macro every time. You can also run it with a custom hotkey sequence in the 'Customize Ribbon' tab in the 'Options' next to the 'Quick Access Toolbar', but I didn't bother with it.
