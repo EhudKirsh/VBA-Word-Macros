@@ -16,13 +16,13 @@ Sub UpdateAll()
     ActiveDocument.Fields.Update
     'This has to be first to re-index captions correctly later in the tables
 
-    ' Update all Table of Figures
+    ' Update all Tables of Figures
     Dim fig As TableOfFigures
     For Each fig In ActiveDocument.TablesOfFigures
         fig.Update
     Next fig
     
-    ' Update all Table of Contents (TOCs)
+    ' Update all Tables of Contents (TOCs)
     Dim toc As TableOfContents
     For Each toc In ActiveDocument.TablesOfContents
         toc.Update
