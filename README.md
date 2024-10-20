@@ -5,7 +5,7 @@ The purpose of this VBA Macro is to update all of these automatically with a sin
 - All Caption Labels (equations, figures and tables by default, but also custom)
 - All Cross-References, including of the above caption labels, but also of headings
 - All References
-- All TOCs, Tables of caption labels and Table of References/Bibliography
+- All TOCs, Tables of Figures & caption labels and Table of References/Bibliography
 ```VBA
 Sub UpdateAll()
     ' Disable screen updating and events for performance
@@ -44,7 +44,7 @@ Now by simply clicking on this icon at the top left on your screen runs this mac
 ---
 <ins>Paste as text:</ins>
 ```VBA
-Sub PasteAsText()
+Sub PasteAsText()'Ctrl+Shift+V
     On Error GoTo ErrorHandler
     'Prevent an error and do nothing in case of an empty clipboard or image
     
