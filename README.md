@@ -14,8 +14,7 @@ Sub UpdateAll()
     ' Update all fields in the document (includes captions)
     ActiveDocument.Fields.Update
     'This has to be first to re-index captions correctly later in the tables
-'-------------------------------------------------------------------------------------------------
-
+'----------------------------------------------------------------------------
     'Update Bibliography References Table Style
     Dim F As Field
     Dim found As Boolean
@@ -36,7 +35,7 @@ Sub UpdateAll()
             Exit For
         End If
     Next F
-'-------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------
 
     ' Update all Tables of Figures
     Dim fig As TableOfFigures
