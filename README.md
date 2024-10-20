@@ -14,6 +14,29 @@ Sub UpdateAll()
     ' Update all fields in the document (includes captions)
     ActiveDocument.Fields.Update
     'This has to be first to re-index captions correctly later in the tables
+'-------------------------------------------------------------------------------------------------
+
+    'Update Bibliography References Table Style
+    Dim F As Field
+    Dim found As Boolean
+    found = False
+
+    For Each F In ActiveDocument.Fields
+        If F.Type = wdFieldBibliography Then
+            Dim C As Object
+            Set C = F.Result.Tables(1).columns
+
+            'Pick how many digits of references you have:
+            'C(1).Width = 17 '[9]
+            'C(1).Width = 22 '[99]
+            C(1).Width = 28 '[999]
+
+            C(2).Width = AutoFit
+
+            Exit For
+        End If
+    Next F
+'-------------------------------------------------------------------------------------------------
 
     ' Update all Tables of Figures
     Dim fig As TableOfFigures
@@ -44,7 +67,7 @@ Now by simply clicking on this icon at the top left on your screen runs this mac
 ---
 <ins>Paste as text:</ins>
 ```VBA
-Sub PasteAsText()'Ctrl+Shift+V
+Sub PasteAsText() 'Ctrl+Shift+V
     On Error GoTo ErrorHandler
     'Prevent an error and do nothing in case of an empty clipboard or image
     
