@@ -15,6 +15,7 @@ Sub UpdateAll()
     ActiveDocument.Fields.Update
     'This has to be first to re-index captions correctly later in the tables
 '----------------------------------------------------------------------------
+
     'Update Bibliography References Table Style
     Dim F As Field
     Dim found As Boolean
