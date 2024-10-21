@@ -26,10 +26,10 @@ Sub UpdateAll()
             Dim C As Object
             Set C = F.Result.Tables(1).columns
 
-            'Pick how many digits of references you have:
+            'Optional - pick how many digits of references you have:
             'C(1).Width = 17 '[9]
             'C(1).Width = 22 '[99]
-            C(1).Width = 28 '[999]
+            C(1).Width = 30 '[999]
 
             C(2).Width = AutoFit
 
@@ -59,25 +59,17 @@ End Sub
 ```
 <ins>Steps to put this macro in Word:</ins>
 1) Open the 'Microsoft Visual Basic for Applications' window by pressing Alt+F11 OR click on 'Developer' tab -> 'Visual Basic' under 'Code' -> click on 'Insert' -> 'Module' -> copy the above program and paste into this module -> Save by pressing Ctrl+S OR Click on the Save icon 💾
-2) Run it to check it works by pressing F5 OR clicking on the Run icon ►
-3) Add this macro to the Quick Access Toolbar: click on 'File' -> 'Options' -> 'Quick Access Toolbar' -> '<ins>C</ins>hoose commands from:' -> 'Macros' -> click on the macro you created -> '<ins>A</ins>dd >>' -> click on this macro that you just added to the right -> '<ins>M</ins>odify...' -> Pick a nice Display name and icon, I like 'UpdateAll' and the Run symbol ▷ -> OK & OK
+2) Run it to check it works by pressing F5 OR clicking on the Run icon ▷
+3) Add this macro to the Quick Access Toolbar: click on 'File' -> 'Options' -> 'Quick Access Toolbar' -> '<ins>C</ins>hoose commands from:' -> 'Macros' -> click on the macro you created -> '<ins>A</ins>dd >>' -> click on this macro that you just added to the right -> '<ins>M</ins>odify...' -> Pick a nice Display name and icon, I like 'UpdateAll' and the update document symbol 📄🔄 -> OK & OK
 <!-- To Do: Add screenshots here -->
 Now by simply clicking on this icon at the top left on your screen runs this macro every time. You can also run it with a custom hotkey sequence in the 'Customize Ribbon' tab in the 'Options' next to the 'Quick Access Toolbar', but I didn't bother with it.
 
 ---
 <ins>Paste as text:</ins>
 ```VBA
-Sub PasteAsText() 'Ctrl+Shift+V
-    On Error GoTo ErrorHandler
-    'Prevent an error and do nothing in case of an empty clipboard or image
-    
-    Selection.PasteAndFormat (wdFormatPlainText)
-    'Selection.PasteSpecial DataType:=wdPasteText
-
-    Exit Sub
-
-ErrorHandler:
-    Err.Clear
+Sub PasteAsText() '(Ctrl+Shift+V)
+    On Error Resume Next 'Prevent an error and simply do nothing in case of an empty clipboard or image
+    Selection.PasteAndFormat (wdFormatPlainText) 'Selection.PasteSpecial DataType:=wdPasteText, but faster
 End Sub
 ```
 Techinically, PasteAsText can be set to be the default paste in the Options, but it tends to not work. Also, this macro also helps to create a hot key shortcut as shown in the steps below:
