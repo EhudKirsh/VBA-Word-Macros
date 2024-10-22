@@ -11,15 +11,20 @@ Sub UpdateAll()
     ' Disable screen updating and events for performance
     Application.ScreenUpdating = False
     
-    ' Update all fields in the document (includes captions)
-    ActiveDocument.Fields.Update
-    'This has to be first to re-index captions correctly later in the tables
+'-------------------------------------------------------------------------------------------------
 
-'----------------------------------------------------------------------------
+    'Firstly hide the field codes so Word doesn't need to update their display
+    ActiveWindow.View.ShowFieldCodes = False
+    
+    ' Update all fields in the document, including references, cross references & caption labels
+    ActiveDocument.Fields.Update
+    'This has to be here at the start before updating TOCs & TOFs to re-index captions correctly later in the tables
+
+'-------------------------------------------------------------------------------------------------
 
     'Update Bibliography References Table Style. This has to be before the TOCs, because resizing the Bibliography stops spilling into more pages
     Dim T As Table
-    Dim F As Field
+    Dim F As field
     Dim FieldsCount As Long
     FieldsCount = ActiveDocument.Fields.Count
     For i = FieldsCount To 1 Step -1 'Searching from the end, because the bibliography is most likely in the latter half of the document
@@ -48,23 +53,21 @@ Sub UpdateAll()
         End If
     Next i
 
-'----------------------------------------------------------------------------
+'-------------------------------------------------------------------------------------------------
 
-    ' Update all Tables of Figures
-    Dim fig As TableOfFigures
-    For Each fig In ActiveDocument.TablesOfFigures
-        fig.Update
-    Next fig
-    
-    ' Update all Tables of Contents (TOCs)
+    ' Update all Tables of Figures & Contents
+    Dim ToF As TableOfFigures
+    For Each ToF In ActiveDocument.TablesOfFigures
+        ToF.Update
+    Next ToF
+
     Dim toc As TableOfContents
     For Each toc In ActiveDocument.TablesOfContents
         toc.Update
     Next toc
-    'Keep TOCs last, because the others might change page numbers
-
-    ActiveWindow.View.ShowFieldCodes = False
-
+    
+'-------------------------------------------------------------------------------------------------
+    
     ' Re-enable screen updating and events
     Application.ScreenUpdating = True
 End Sub
