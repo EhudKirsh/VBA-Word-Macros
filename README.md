@@ -22,7 +22,7 @@ Sub UpdateAll()
 
 '-------------------------------------------------------------------------------------------------
 
-    'Update Bibliography References Table Style. This has to be before the TOCs, because resizing the Bibliography stops spilling into more pages
+    'Update Bibliography References Table Style. This has to be before the TOCs, it can spill into more pages, so we start from the end
     Dim T As Table
     Dim F As field
     Dim FieldsCount As Long
