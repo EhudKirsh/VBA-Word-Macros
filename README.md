@@ -14,28 +14,40 @@ Sub UpdateAll()
     ' Update all fields in the document (includes captions)
     ActiveDocument.Fields.Update
     'This has to be first to re-index captions correctly later in the tables
+
 '----------------------------------------------------------------------------
 
-    'Update Bibliography References Table Style
+    'Update Bibliography References Table Style. This has to be before the TOCs, because resizing the Bibliography stops spilling into more pages
+    Dim T As Table
     Dim F As Field
-    Dim found As Boolean
-    found = False
-
-    For Each F In ActiveDocument.Fields
-        If F.Type = wdFieldBibliography Then
-            Dim C As Object
-            Set C = F.Result.Tables(1).columns
+    Dim FieldsCount As Long
+    FieldsCount = ActiveDocument.Fields.Count
+    For i = FieldsCount To 1 Step -1 'Searching from the end, because the bibliography is most likely in the latter half of the document
+        Set F = ActiveDocument.Fields(i)
+        If F.Type = wdFieldBibliography Then 'Find the bibliography
+            Dim cols, C2 As Object
+            Set cols = F.Result.Tables(1).columns
 
             'Optional - pick how many digits of references you have:
-            'C(1).Width = 17 '[9]
-            'C(1).Width = 22 '[99]
-            C(1).Width = 30 '[999]
+            'cols(1).Width = 17 '[9]
+            'cols(1).Width = 22 '[99]
+            cols(1).Width = 30 '[999]
 
-            C(2).Width = AutoFit
+            Set C2 = cols(2)
+            C2.AutoFit 'Width
 
-            Exit For
+            Dim CellsRange As Cells
+            Set CellsRange = C2.Cells
+
+            Dim c As Cell
+            For Each c In CellsRange
+                c.Range.ParagraphFormat.Alignment = wdAlignParagraphLeft
+            Next c
+
+            Exit For 'Increase efficiency and stop searching, assume only 1 bibliography
         End If
-    Next F
+    Next i
+
 '----------------------------------------------------------------------------
 
     ' Update all Tables of Figures
