@@ -1,11 +1,11 @@
-In Microsoft Word, to update all references and cross references, typically people use Ctrl+A to select all and then press F9. This however pops up an annoying window that maunally needs to be clicked. It's stupid, annoying and wastes time. This window pops up for every Table of Content (TOC) and every Table of caption labels.
+In Microsoft Word, to update all references and cross references, typically people use Ctrl+A to select all and then press F9. This however pops up an annoying window that maunally needs to be clicked. It's stupid, annoying and wastes time. This window pops up for every Table of Content and every Table of caption labels.
 <!-- To Do: Add 2 screenshots here: TOC & Table of Figures -->
 The purpose of this VBA Macro is to update all of these automatically with a single click without any window like this poping up. Specifically, it updates all of the following:
 
 - All Caption Labels (equations, figures and tables by default, but also custom)
 - All Cross-References, including of the above caption labels, but also of headings
 - All References
-- All TOCs, Tables of Figures & caption labels and Table of References/Bibliography
+- All Tables of Contents, Tables of Figures and Bibliography References Table
 ```VBA
 Sub UpdateAll()
     ' Disable screen updating and events for performance
