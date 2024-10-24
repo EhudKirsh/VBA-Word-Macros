@@ -109,12 +109,17 @@ Sub CountFields() 'Including field codes, but not only
 End Sub
 ```
 ```VBA
+Sub CountToCs() '#Tables of Contents
+    MsgBox "Number of Tables of Contents: " & ActiveDocument.TablesOfContents.Count
+End Sub
+```
+```VBA
 Sub CountToFs() '#Tables of Figures
     MsgBox "Number of Tables of Figures: " & ActiveDocument.TablesOfFigures.Count
 End Sub
 ```
 ```VBA
-Sub CountToCs() '#Tables of Contents
-    MsgBox "Number of Tables of Contents: " & ActiveDocument.TablesOfContents.Count
+Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
+    MsgBox "Number of Tables: " & ActiveDocument.Tables.Count
 End Sub
 ```
