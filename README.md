@@ -7,44 +7,26 @@ The purpose of this VBA Macro is to update all of these automatically with a sin
 - All References
 - All Tables of Contents, Tables of Figures and Bibliography References Table
 ```VBA
-Sub UpdateTablesOfFiguresAndContents()
-    Dim ToFs As TablesOfFigures: Dim ToCs As TablesOfContents: Dim Paras As Paragraphs
-    Set ToFs = ActiveDocument.TablesOfFigures: Set ToCs = ActiveDocument.TablesOfContents
+Sub UpdateAll()
+    Application.ScreenUpdating = False 'This improves performance
 
-    Dim p, n, Change, i As Integer  'p = #pages, n = new #pages, Change = change in #page, i = #Loop iterations
-    n = ActiveDocument.ComputeStatistics(wdStatisticPages) '#Pages
-    i = 0: Change = 0
+    'Firstly hide the field codes so Word doesn't need to update their display
+    ActiveWindow.View.ShowFieldCodes = False 'Alt + F9
 
-    Do 'The Do-Until Loop is in case of potentially spilling ToCs and ToFs.
-        i = i + 1: p = n
+    'Update all fields in the document, including references, cross references & caption labels
+    ActiveDocument.Fields.Update
+    'This has to be before StyleBibliography because it resets the style and can also add rows
 
-        For Each ToF In ToFs
-            ToF.Update
-        Next ToF
+    StyleBibliography 'This has to be before UpdateTablesOfFiguresAndContents, because the bibliography can spill into more pages, so we start from the end
 
-        For Each ToC In ToCs
-            ToC.Update
-            Set Paras = ToC.Range.Paragraphs
-            For Each para In Paras
-                para.LeftIndent = (Val(Right(para.Style, 1)) - 1) * 21
-            Next para
-        Next ToC
+    UpdateTablesOfFiguresAndContents
 
-        n = ActiveDocument.ComputeStatistics(wdStatisticPages)
-        Change = Change + n - p 'postive means increase, negative means decrease
-    Loop Until p = n
-
-    If Change > 0 Then
-        MsgBox "# iterations: " & i & vbCrLf & "# pages increased: " & Change
-    ElseIf Change < 0 Then
-        MsgBox "# iterations: " & i & vbCrLf & "# pages decreased: " & -1 * Change 'Abs(Change)
-    End If 'No need to MsgBox if Change = 0 because this is typically the case
+    Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
 
 Sub StyleBibliography()
     'Style the Bibliography References Table: turn https into hyperlinks, adjust columns widths and align text to the left
-    Dim T As Table
-    Dim f As field
+    Dim T As Table: Dim f As field
     Dim FieldsCount, httpsPos, spacePos As Integer
 
     FieldsCount = ActiveDocument.Fields.Count
@@ -63,9 +45,7 @@ Sub StyleBibliography()
             C2.AutoFit 'Width
 
             Dim CellsRange As Cells: Set CellsRange = C2.Cells
-
-            Dim r As Range
-            Dim cellText, linkText As String
+            Dim r As Range: Dim cellText, linkText As String
 
             For Each c In CellsRange
                 Set r = c.Range
@@ -94,27 +74,44 @@ Sub StyleBibliography()
     Next i
 End Sub
 
-Sub UpdateAll()
-    Application.ScreenUpdating = False 'This improves performance
+Sub UpdateTablesOfFiguresAndContents()
+    Dim ToFs As TablesOfFigures: Dim ToCs As TablesOfContents: Dim Paras As Paragraphs
+    Set ToFs = ActiveDocument.TablesOfFigures: Set ToCs = ActiveDocument.TablesOfContents
 
-    'Firstly hide the field codes so Word doesn't need to update their display
-    ActiveWindow.View.ShowFieldCodes = False 'Alt + F9
+    Dim p, n, Change, i As Integer  'p = #pages, n = new #pages, Change = change in #page, i = #Loop iterations
+    n = ActiveDocument.ComputeStatistics(wdStatisticPages)
+    i = 0: Change = 0
 
-    'Update all fields in the document, including references, cross references & caption labels
-    ActiveDocument.Fields.Update
-    'This has to be before StyleBibliography because it resets the style and can add rows
+    Do 'The Do-Until Loop is in case of potentially spilling ToCs and ToFs.
+        i = i + 1: p = n
 
-    StyleBibliography 'This has to be before UpdateTablesOfFiguresAndContents, because the bibliography can spill into more pages, so we start from the end
+        For Each ToF In ToFs
+            ToF.Update
+        Next ToF
 
-    UpdateTablesOfFiguresAndContents
+        For Each ToC In ToCs
+            ToC.Update
+            Set Paras = ToC.Range.Paragraphs
+            For Each para In Paras
+                para.LeftIndent = (Val(Right(para.Style, 1)) - 1) * 21
+            Next para
+        Next ToC
 
-    Application.ScreenUpdating = True 'Re-enable screen updating
+        n = ActiveDocument.ComputeStatistics(wdStatisticPages)
+        Change = Change + n - p 'postive means increase, negative means decrease
+    Loop Until p = n
+
+    If Change > 0 Then
+        MsgBox "# iterations: " & i & vbCrLf & "# pages increased: " & Change
+    ElseIf Change < 0 Then
+        MsgBox "# iterations: " & i & vbCrLf & "# pages decreased: " & -1 * Change 'Abs(Change)
+    End If 'No need to MsgBox if Change = 0 because this is typically the case
 End Sub
 ```
-<ins>Steps to put this macro in Word:</ins>
-1) Open the 'Microsoft Visual Basic for Applications' window by pressing Alt+F11 OR click on 'Developer' tab -> 'Visual Basic' under 'Code' -> click on 'Insert' -> 'Module' -> copy the above program and paste into this module -> Save by pressing Ctrl+S OR Click on the Save icon 💾
-2) Run it to check it works by pressing F5 OR clicking on the Run icon ▷
-3) Add this macro to the Quick Access Toolbar: click on 'File' -> 'Options' -> 'Quick Access Toolbar' -> '<ins>C</ins>hoose commands from:' -> 'Macros' -> click on the macro you created -> '<ins>A</ins>dd >>' -> click on this macro that you just added to the right -> '<ins>M</ins>odify...' -> Pick a nice Display name and icon, I like 'UpdateAll' and the update document symbol 📄🔄 -> OK & OK
+<ins>Steps to use these macros in Word:</ins>
+1) Open the 'Microsoft Visual Basic for Applications' window by pressing Alt+F11 OR click on 'Developer' tab & 'Visual Basic' under 'Code' -> click on 'Insert' -> 'Module' -> copy the above macros and paste into this module -> Save by pressing Ctrl+S OR Click on the Save icon 💾
+2) Run them to check they work by pressing F5 OR clicking on the Run icon ▷ when the caret stands on whichever macro you'd like to test
+3) Add the UpdateAll macro to the Quick Access Toolbar: click on 'File' -> 'Options' -> 'Quick Access Toolbar' -> '<ins>C</ins>hoose commands from:' -> 'Macros' -> click on the macro you created -> '<ins>A</ins>dd >>' -> click on this macro that you just added to the right -> '<ins>M</ins>odify...' -> Pick a nice Display name and icon, I like 'UpdateAll' and the update document symbol 📄🔄 -> OK & OK
 Now by simply clicking on this icon at the top left on your screen runs this macro every time. You can also run it with a custom hotkey sequence in the 'Customize Ribbon' tab in the 'Options' next to the 'Quick Access Toolbar', but I didn't bother with it.
 
 <!-- To Do: Add screenshots here & link to my PhD thesis to show how the bibliography hyperlinks 🔗 and ToC indentations look like -->
@@ -133,19 +130,14 @@ Techinically, PasteAsText can be set to be the default paste in the Options, but
 ---
 More small interesting and useful macros:
 ```VBA
-Sub TodaysDate()
-    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy"), vbInformation, "Today's Date"
-End Sub 'e.g. Thursday, October 24, 2024
-```
-```VBA
 Sub ShowAllHeadingsInNavigationPane()
     ActiveWindow.DocumentMap = True
 End Sub
 ```
 ```VBA
-Sub CountFields() 'Including field codes, but not only
-    MsgBox "Number of fields: " & ActiveDocument.Fields.Count
-End Sub
+Sub TodaysDate()
+    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy"), vbInformation, "Today's Date"
+End Sub 'e.g. Thursday, October 24, 2024
 ```
 ```VBA
 Sub CountToCs() '#Tables of Contents
@@ -160,5 +152,10 @@ End Sub
 ```VBA
 Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
     MsgBox "Number of Tables: " & ActiveDocument.Tables.Count
+End Sub
+```
+```VBA
+Sub CountFields() 'Including field codes, but not only
+    MsgBox "Number of fields: " & ActiveDocument.Fields.Count
 End Sub
 ```
