@@ -90,7 +90,7 @@ Sub UpdateTablesOfFiguresAndContents()
         Next ToF
 
         For Each ToC In ToCs
-            ToC.Update
+            ToC.Update 'Update first, because it resets the indentation
             Set Paras = ToC.Range.Paragraphs
             For Each para In Paras
                 para.LeftIndent = (Val(Right(para.Style, 1)) - 1) * 21
