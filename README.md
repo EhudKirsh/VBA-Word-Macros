@@ -7,69 +7,108 @@ The purpose of this VBA Macro is to update all of these automatically with a sin
 - All References
 - All Tables of Contents, Tables of Figures and Bibliography References Table
 ```VBA
-Sub UpdateAll()
-    ' Disable screen updating and events for performance
-    Application.ScreenUpdating = False
-    
-'-------------------------------------------------------------------------------------------------
+Sub UpdateTablesOfFiguresAndContents()
+    Dim ToFs As TablesOfFigures: Dim ToCs As TablesOfContents: Dim Paras As Paragraphs
+    Set ToFs = ActiveDocument.TablesOfFigures: Set ToCs = ActiveDocument.TablesOfContents
 
-    'Firstly hide the field codes so Word doesn't need to update their display
-    ActiveWindow.View.ShowFieldCodes = False
-    
-    ' Update all fields in the document, including references, cross references & caption labels
-    ActiveDocument.Fields.Update
-    'This has to be here at the start before updating TOCs & TOFs to re-index captions correctly later in the tables
+    Dim p, n, Change, i As Integer  'p = #pages, n = new #pages, Change = change in #page, i = #Loop iterations
+    n = ActiveDocument.ComputeStatistics(wdStatisticPages) '#Pages
+    i = 0: Change = 0
 
-'-------------------------------------------------------------------------------------------------
+    Do 'The Do-Until Loop is in case of potentially spilling ToCs and ToFs.
+        i = i + 1: p = n
 
-    'Update Bibliography References Table Style. This has to be before the TOCs, it can spill into more pages, so we start from the end
+        For Each ToF In ToFs
+            ToF.Update
+        Next ToF
+
+        For Each ToC In ToCs
+            ToC.Update
+            Set Paras = ToC.Range.Paragraphs
+            For Each para In Paras
+                para.LeftIndent = (Val(Right(para.Style, 1)) - 1) * 21
+            Next para
+        Next ToC
+
+        n = ActiveDocument.ComputeStatistics(wdStatisticPages)
+        Change = Change + n - p 'postive means increase, negative means decrease
+    Loop Until p = n
+
+    If Change > 0 Then
+        MsgBox "# iterations: " & i & vbCrLf & "# pages increased: " & Change
+    ElseIf Change < 0 Then
+        MsgBox "# iterations: " & i & vbCrLf & "# pages decreased: " & -1 * Change 'Abs(Change)
+    End If 'No need to MsgBox if Change = 0 because this is typically the case
+End Sub
+
+Sub StyleBibliography()
+    'Style the Bibliography References Table: turn https into hyperlinks, adjust columns widths and align text to the left
     Dim T As Table
-    Dim F As field
-    Dim FieldsCount As Long
+    Dim f As field
+    Dim FieldsCount, httpsPos, spacePos As Integer
+
     FieldsCount = ActiveDocument.Fields.Count
     For i = FieldsCount To 1 Step -1 'Searching from the end, because the bibliography is most likely in the latter half of the document
-        Set F = ActiveDocument.Fields(i)
-        If F.Type = wdFieldBibliography Then 'Find the bibliography
+        Set f = ActiveDocument.Fields(i)
+        If f.Type = wdFieldBibliography Then 'Find the bibliography
             Dim cols, C2 As Object
-            Set cols = F.Result.Tables(1).columns
+            Set T = f.Result.Tables(1): T.AllowAutoFit = False
+            Set cols = T.columns: Set C2 = cols(2)
 
             'Optional - pick how many digits of references you have:
-            'cols(1).Width = 17 '[9]
-            'cols(1).Width = 22 '[99]
-            cols(1).Width = 30 '[999]
+            'cols(1).Width = 17 ': C2.Width = 420 '[9]
+            'cols(1).Width = 22 ': C2.Width = 415 '[99]
+            cols(1).Width = 30 ': C2.Width = 407 '[999]
 
-            Set C2 = cols(2)
             C2.AutoFit 'Width
 
-            Dim CellsRange As Cells
-            Set CellsRange = C2.Cells
+            Dim CellsRange As Cells: Set CellsRange = C2.Cells
 
-            Dim c As Cell
+            Dim r As Range
+            Dim cellText, linkText As String
+
             For Each c In CellsRange
-                c.Range.ParagraphFormat.Alignment = wdAlignParagraphLeft
+                Set r = c.Range
+                r.ParagraphFormat.Alignment = wdAlignParagraphLeft
+
+                cellText = r.Text: cellText = Left(cellText, Len(cellText) - 2)
+                httpsPos = InStr(cellText, "https")
+                If httpsPos > 0 Then
+                    'Find the first space after "https"
+                    spacePos = InStr(httpsPos, cellText, " ")
+                    If spacePos = 0 Then spacePos = Len(cellText) + 1 'Use text length if no space is found
+
+                    'Extract the link text (URL)
+                    linkText = Mid(cellText, httpsPos, spacePos - httpsPos - 1) 'Assuming there's a dot '.' just before thespace ' '
+
+                    r.Start = r.Start + httpsPos - 1 'Assuming there's a dot '.' just before thespace ' '
+                    r.End = r.Start + Len(linkText)
+
+                    'Insert the hyperlink
+                    ActiveDocument.Hyperlinks.Add Anchor:=r, Address:=linkText
+                End If
             Next c
 
             Exit For 'Increase efficiency and stop searching, assume only 1 bibliography
         End If
     Next i
+End Sub
 
-'-------------------------------------------------------------------------------------------------
+Sub UpdateAll()
+    Application.ScreenUpdating = False 'This improves performance
 
-    ' Update all Tables of Figures & Contents
-    Dim ToF As TableOfFigures
-    For Each ToF In ActiveDocument.TablesOfFigures
-        ToF.Update
-    Next ToF
+    'Firstly hide the field codes so Word doesn't need to update their display
+    ActiveWindow.View.ShowFieldCodes = False 'Alt + F9
 
-    Dim toc As TableOfContents
-    For Each toc In ActiveDocument.TablesOfContents
-        toc.Update
-    Next toc
+    'Update all fields in the document, including references, cross references & caption labels
+    ActiveDocument.Fields.Update
+    'This has to be before StyleBibliography because it resets the style and can add rows
 
-'-------------------------------------------------------------------------------------------------
+    StyleBibliography 'This has to be before UpdateTablesOfFiguresAndContents, because the bibliography can spill into more pages, so we start from the end
 
-    ' Re-enable screen updating and events
-    Application.ScreenUpdating = True
+    UpdateTablesOfFiguresAndContents
+
+    Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
 ```
 <ins>Steps to put this macro in Word:</ins>
