@@ -65,9 +65,9 @@ Sub UpdateAll()
     For Each toc In ActiveDocument.TablesOfContents
         toc.Update
     Next toc
-    
+
 '-------------------------------------------------------------------------------------------------
-    
+
     ' Re-enable screen updating and events
     Application.ScreenUpdating = True
 End Sub
@@ -76,9 +76,9 @@ End Sub
 1) Open the 'Microsoft Visual Basic for Applications' window by pressing Alt+F11 OR click on 'Developer' tab -> 'Visual Basic' under 'Code' -> click on 'Insert' -> 'Module' -> copy the above program and paste into this module -> Save by pressing Ctrl+S OR Click on the Save icon 💾
 2) Run it to check it works by pressing F5 OR clicking on the Run icon ▷
 3) Add this macro to the Quick Access Toolbar: click on 'File' -> 'Options' -> 'Quick Access Toolbar' -> '<ins>C</ins>hoose commands from:' -> 'Macros' -> click on the macro you created -> '<ins>A</ins>dd >>' -> click on this macro that you just added to the right -> '<ins>M</ins>odify...' -> Pick a nice Display name and icon, I like 'UpdateAll' and the update document symbol 📄🔄 -> OK & OK
-<!-- To Do: Add screenshots here -->
 Now by simply clicking on this icon at the top left on your screen runs this macro every time. You can also run it with a custom hotkey sequence in the 'Customize Ribbon' tab in the 'Options' next to the 'Quick Access Toolbar', but I didn't bother with it.
 
+<!-- To Do: Add screenshots here & link to my PhD thesis to show how the bibliography hyperlinks 🔗 and ToC indentations look like -->
 ---
 <ins>Paste as text:</ins>
 ```VBA
@@ -91,3 +91,30 @@ Techinically, PasteAsText can be set to be the default paste in the Options, but
 
 1) Add this macro to the Quick Access Toolbar with the 3 steps above. I use the clipboard 📋 symbol and 'PasteAsText (Ctrl+Shift+V)' Display name.
 2) Now click on 'Customize Ribbon' in the Options -> 'Keyboard shortcuts: Cus<ins>t</ins>omize...' -> <ins>C</ins>ategories: 'Macros' -> Click on the macro on the right you want to assign a shortcut hot key to, PasteAsText in this case -> Look at 'C<ins>u</ins>rrent keys:' to see what the current shortcut hot keys are for it, but if it's empty or not to your liking, record your new shortcut hot keys by clicking on 'Press <ins>n</ins>ew shortcut key:', I use Ctrl+Shift+V -> <ins>A</ins>ssign -> Close & OK
+---
+More small interesting and useful macros:
+```VBA
+Sub TodaysDate()
+    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy"), vbInformation, "Today's Date"
+End Sub 'e.g. Thursday, October 24, 2024
+```
+```VBA
+Sub ShowAllHeadingsInNavigationPane()
+    ActiveWindow.DocumentMap = True
+End Sub
+```
+```VBA
+Sub CountFields() 'Including field codes, but not only
+    MsgBox "Number of fields: " & ActiveDocument.Fields.Count
+End Sub
+```
+```VBA
+Sub CountToFs() '#Tables of Figures
+    MsgBox "Number of Tables of Figures: " & ActiveDocument.TablesOfFigures.Count
+End Sub
+```
+```VBA
+Sub CountToCs() '#Tables of Contents
+    MsgBox "Number of Tables of Contents: " & ActiveDocument.TablesOfContents.Count
+End Sub
+```
