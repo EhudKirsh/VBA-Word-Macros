@@ -25,65 +25,97 @@ Sub UpdateAll()
 End Sub
 
 Sub StyleBibliography()
+    Application.ScreenUpdating = False 'This improves performance
+
     'Style the Bibliography References Table: turn https into hyperlinks, adjust columns widths and align text to the left
-    Dim T As Table: Dim f As field
-    Dim FieldsCount, httpsPos, spacePos As Integer
+    Dim T As Table: Set T = FindBibliography: T.AllowAutoFit = False
+    Dim httpsPos, spacePos As Integer: Dim cols, C2 As Object
 
-    FieldsCount = ActiveDocument.Fields.Count
-    For i = FieldsCount To 1 Step -1 'Searching from the end, because the bibliography is most likely in the latter half of the document
-        Set f = ActiveDocument.Fields(i)
-        If f.Type = wdFieldBibliography Then 'Find the bibliography
-            Dim cols, C2 As Object
-            Set T = f.Result.Tables(1): T.AllowAutoFit = False
-            Set cols = T.columns: Set C2 = cols(2)
+    Set cols = T.columns: Set C2 = cols(2)
 
-            'Optional - pick how many digits of references you have:
-            'cols(1).Width = 17 ': C2.Width = 420 '[9]
-            'cols(1).Width = 22 ': C2.Width = 415 '[99]
-            cols(1).Width = 30 ': C2.Width = 407 '[999]
+    'Optional - pick how many digits of references you have:
+    'cols(1).Width = 17 ': C2.Width = 420 '[9]
+    'cols(1).Width = 22 ': C2.Width = 415 '[99]
+    cols(1).Width = 30 ': C2.Width = 407 '[999]
 
-            C2.AutoFit 'Width
+    C2.AutoFit 'Width
 
-            Dim CellsRange As Cells: Set CellsRange = C2.Cells
-            Dim r As Range: Dim cellText, linkText As String
+    Dim CellsRange As Cells: Set CellsRange = C2.Cells
+    Dim r As Range: Dim cellText, linkText As String
+    For Each c In CellsRange
+        Set r = c.Range
 
-            For Each c In CellsRange
-                Set r = c.Range
-                r.ParagraphFormat.Alignment = wdAlignParagraphLeft
+        r.ParagraphFormat.Alignment = wdAlignParagraphLeft 'Align Left
 
-                cellText = r.Text: cellText = Left(cellText, Len(cellText) - 2)
-                httpsPos = InStr(cellText, "https")
-                If httpsPos > 0 Then
-                    'Find the first space after "https"
-                    spacePos = InStr(httpsPos, cellText, " ")
-                    If spacePos = 0 Then spacePos = Len(cellText) + 1 'Use text length if no space is found
+        'Hyperlinks
+        cellText = r.Text: cellText = Left(cellText, Len(cellText) - 2)
+        httpsPos = InStr(cellText, "https")
+        If httpsPos > 0 Then
+            spacePos = InStr(httpsPos, cellText, " ") 'Find the first space after "https"
+            If spacePos = 0 Then spacePos = Len(cellText) + 1 'Use text length if no space is found
 
-                    'Extract the link text (URL)
-                    linkText = Mid(cellText, httpsPos, spacePos - httpsPos - 1) 'Assuming there's a dot '.' just before thespace ' '
+            'Extract the link text (URL)
+            linkText = Mid(cellText, httpsPos, spacePos - httpsPos - 1) 'Assuming there's a dot '.' just before thespace ' '
 
-                    r.Start = r.Start + httpsPos - 1 'Assuming there's a dot '.' just before thespace ' '
-                    r.End = r.Start + Len(linkText)
+            r.Start = r.Start + httpsPos - 1 'Assuming there's a dot '.' just before thespace ' '
+            r.End = r.Start + Len(linkText)
 
-                    'Insert the hyperlink
-                    ActiveDocument.Hyperlinks.Add Anchor:=r, Address:=linkText
-                End If
-            Next c
-
-            Exit For 'Increase efficiency and stop searching, assume only 1 bibliography
+            ActiveDocument.Hyperlinks.Add Anchor:=r, Address:=linkText
         End If
-    Next i
+    Next c
+
+    Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
 
+Function FindBibliography() As Table
+    Application.ScreenUpdating = False 'This improves performance
+
+    'There is no in-built syntax to find the Bibliography References Table. This function finds it and attempts to do so in the most quick and efficient way.
+    Dim p As Integer ' n 'p = page, n = new page
+    Dim RangeFields As Fields
+
+    Dim DocTables As Tables: Set DocTables = ActiveDocument.Tables
+    Dim rng As Range: Set rng = ActiveDocument.Range
+
+    For Each T In DocTables 'T = Table
+        n = T.Range.Information(wdActiveEndPageNumber): If p = n Then GoTo SkipLoop 'If a single page has multiple tables, skip because we already checked this page
+        'I search all the field codes in the page because I can't figure the relation (parent, sibling, etc) because the Bibliography table and field code.
+        'But at least I narrow down the search only to pages that have ActiveDocument.Tables.
+
+        rng.Start = rng.GoTo(What:=wdGoToPage, Which:=wdGoToAbsolute, Count:=n).Start
+        rng.End = rng.GoTo(What:=wdGoToPage, Which:=wdGoToAbsolute, Count:=n + 1).Start
+
+        Set RangeFields = rng.Fields 'Fields on the page of the table
+
+        For Each fld In RangeFields
+            If fld.Type = wdFieldBibliography Then
+                Set FindBibliography = fld.Result.Tables(1)
+                MsgBox "Bibliography is (ends) on page " & FindBibliography.Range.Information(wdActiveEndPageNumber)
+                Application.ScreenUpdating = True 'Re-enable screen updating
+                Exit Function 'Increase efficiency and stop searching, assuming there is only 1 Bibliography References Table
+            End If
+        Next fld
+        p = n
+SkipLoop:
+    Next T 'Many bibliographies are followed by an appendix with many tables, so it's not obvious that the Bibliography table is in the latter half of ActiveDocument.Tables.
+    'Also, For-In is faster than For-To-Step in VBA, so for both reasons it makes sense to search through the tables with For-In as opposed to from the end.
+
+    MsgBox "No Bibliography Found"
+    Application.ScreenUpdating = True 'Re-enable screen updating
+End Function
+
 Sub UpdateTablesOfFiguresAndContents()
+    Application.ScreenUpdating = False 'This improves performance
+
     Dim ToFs As TablesOfFigures: Dim ToCs As TablesOfContents: Dim Paras As Paragraphs
     Set ToFs = ActiveDocument.TablesOfFigures: Set ToCs = ActiveDocument.TablesOfContents
 
-    Dim p, n, Change, i As Integer  'p = #pages, n = new #pages, Change = change in #page, i = #Loop iterations
+    Dim p, n, Change, i, j As Integer  'p = #pages, n = new #pages, Change = change in #page, i = #Loop iterations
     n = ActiveDocument.ComputeStatistics(wdStatisticPages)
     i = 0: Change = 0
 
     Do 'The Do-Until Loop is in case of potentially spilling ToCs and ToFs.
-        i = i + 1: p = n
+        i = i + 1: p = n: j = 0
 
         For Each ToF In ToFs
             ToF.Update
@@ -91,10 +123,17 @@ Sub UpdateTablesOfFiguresAndContents()
 
         For Each ToC In ToCs
             ToC.Update 'Update first, because it resets the indentation
-            Set Paras = ToC.Range.Paragraphs
-            For Each para In Paras
-                para.LeftIndent = (Val(Right(para.Style, 1)) - 1) * 21
-            Next para
+            
+            j = j + 1: Set Paras = ToC.Range.Paragraphs
+            If j = 1 Then '1st ToC is a special case
+                For Each para In Paras
+                    para.LeftIndent = (Val(Right(para.Style, 1)) - 1) * 21
+                Next para
+            Else 'Indent all to the left except in the 1st ToC
+                For Each para In Paras
+                    para.LeftIndent = (Val(Right(para.Style, 1)) - 1) * 21 - 20
+                Next para
+            End If
         Next ToC
 
         n = ActiveDocument.ComputeStatistics(wdStatisticPages)
@@ -106,6 +145,8 @@ Sub UpdateTablesOfFiguresAndContents()
     ElseIf Change < 0 Then
         MsgBox "# iterations: " & i & vbCrLf & "# pages decreased: " & -1 * Change 'Abs(Change)
     End If 'No need to MsgBox if Change = 0 because this is typically the case
+    
+    Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
 ```
 <ins>Steps to use these macros in Word:</ins>
