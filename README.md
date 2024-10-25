@@ -27,9 +27,9 @@ End Sub
 Sub StyleBibliography()
     Application.ScreenUpdating = False 'This improves performance
 
-    'Style the Bibliography References Table: turn https into hyperlinks, adjust columns widths and align text to the left
+    'Style the Bibliography References Table: turn http into hyperlinks, adjust columns widths and align text to the left
     Dim T As Table: Set T = FindBibliography: T.AllowAutoFit = False
-    Dim httpsPos, spacePos As Integer: Dim cols, C2 As Object
+    Dim httpPos, spacePos As Integer: Dim cols, C2 As Object
 
     Set cols = T.columns: Set C2 = cols(2)
 
@@ -49,18 +49,19 @@ Sub StyleBibliography()
 
         'Hyperlinks
         cellText = r.Text: cellText = Left(cellText, Len(cellText) - 2)
-        httpsPos = InStr(cellText, "https")
-        If httpsPos > 0 Then
-            spacePos = InStr(httpsPos, cellText, " ") 'Find the first space after "https"
+        httpPos = InStr(cellText, "http") 'some links don't have the 's' in 'https', but 'http' works for both
+        If httpPos > 0 Then
+            spacePos = InStr(httpPos, cellText, " ") 'Find the first space after "http"
             If spacePos = 0 Then spacePos = Len(cellText) + 1 'Use text length if no space is found
 
             'Extract the link text (URL)
-            linkText = Mid(cellText, httpsPos, spacePos - httpsPos - 1) 'Assuming there's a dot '.' just before thespace ' '
+            linkText = Mid(cellText, httpPos, spacePos - httpPos - 1) 'Assuming there's a dot '.' just before thespace ' '
 
-            r.Start = r.Start + httpsPos - 1 'Assuming there's a dot '.' just before thespace ' '
+            r.Start = r.Start + httpPos - 1 'Assuming there's a dot '.' just before thespace ' '
             r.End = r.Start + Len(linkText)
 
             ActiveDocument.Hyperlinks.Add Anchor:=r, Address:=linkText
+
         End If
     Next c
 
@@ -177,7 +178,7 @@ End Sub
 ```
 ```VBA
 Sub TodaysDate()
-    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy"), vbInformation, "Today's Date"
+    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy")
 End Sub 'e.g. Thursday, October 24, 2024
 ```
 ```VBA
@@ -196,7 +197,50 @@ Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
 End Sub
 ```
 ```VBA
-Sub CountFields() 'Including field codes, but not only
-    MsgBox "Number of fields: " & ActiveDocument.Fields.Count
+Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
+    MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
 End Sub
 ```
+```VBA
+Sub CountReferences()
+    MsgBox "Number of References: " & ActiveDocument.Bibliography.Sources.Count
+End Sub
+```
+```VBA
+Sub CountCrossReferences()
+    Application.ScreenUpdating = False 'This improves performance
+
+    Dim c As Long: c = 0
+    Dim flds As Fields: Set flds = ActiveDocument.Fields
+    For Each fld In flds
+        If fld.Type = wdFieldRef Then
+            c = c + 1
+        End If
+    Next
+    MsgBox "Number of Cross-References: " & c
+
+    Application.ScreenUpdating = True 'Re-enable screen updating
+End Sub
+```
+```VBA
+Sub CountFields() 'Including field codes, but not only
+    MsgBox "Number of Fields: " & ActiveDocument.Fields.Count
+End Sub
+```
+```VBA
+Sub CountHyperlinksURLs()
+    Application.ScreenUpdating = False 'This improves performance
+
+    Dim c As Integer: c = 0
+    Dim flds As Fields: Set flds = ActiveDocument.Fields
+    For Each fld In flds
+        If fld.Type = wdFieldHyperlink Then
+            c = c + 1
+        End If
+    Next
+    MsgBox "Number of Hyperlinks URLs: " & c
+
+    Application.ScreenUpdating = True 'Re-enable screen updating
+End Sub
+```
+Note that screen updating is only disabled in subs and functions that are not instant.
