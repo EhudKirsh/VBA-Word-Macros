@@ -232,7 +232,7 @@ End Sub
 Sub CountCrossReferences()
     Application.ScreenUpdating = False 'This improves performance
 
-    Dim c As Long: c = 0
+    Dim c As Integer: c = 0
     Dim flds As Fields: Set flds = ActiveDocument.Fields
     For Each fld In flds
         If fld.Type = wdFieldRef Then
