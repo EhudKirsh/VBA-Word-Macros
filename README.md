@@ -172,6 +172,16 @@ Techinically, PasteAsText can be set to be the default paste in the Options, but
 ---
 More small interesting and useful macros:
 ```VBA
+Sub ShowHeadingsInNavigationPane()
+    ActiveWindow.DocumentMap = True
+End Sub
+```
+```VBA
+Sub SaveDocument()
+    ActiveDocument.Save
+End Sub
+```
+```VBA
 Sub DocumentFolderPath() 'Where it's saved to
     Dim p As String: p = ActiveDocument.Path
     If p <> "" Then
@@ -179,11 +189,6 @@ Sub DocumentFolderPath() 'Where it's saved to
     Else
         MsgBox "This document hasn't been saved yet"
     End If
-End Sub
-```
-```VBA
-Sub ShowHeadingsInNavigationPane()
-    ActiveWindow.DocumentMap = True
 End Sub
 ```
 ```VBA
