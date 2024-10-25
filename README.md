@@ -172,7 +172,17 @@ Techinically, PasteAsText can be set to be the default paste in the Options, but
 ---
 More small interesting and useful macros:
 ```VBA
-Sub ShowAllHeadingsInNavigationPane()
+Sub DocumentFolderPath() 'Where it's saved to
+    Dim p As String: p = ActiveDocument.Path
+    If p <> "" Then
+        MsgBox "Document Path: " & p
+    Else
+        MsgBox "This document hasn't been saved yet"
+    End If
+End Sub
+```
+```VBA
+Sub ShowHeadingsInNavigationPane()
     ActiveWindow.DocumentMap = True
 End Sub
 ```
@@ -182,6 +192,12 @@ Sub TodaysDate()
 End Sub 'e.g. Thursday, October 24, 2024
 ```
 ```VBA
+Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
+    MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
+End Sub
+```
+```VBA
+'Note that I have 1 bookmark for every ToC besides the main ToC, so for me: #ToCs = #Bookmarks + 1. For you it might be different if you use bookmarks for other purposes as well.
 Sub CountToCs() '#Tables of Contents
     MsgBox "Number of Tables of Contents: " & ActiveDocument.TablesOfContents.Count
 End Sub
@@ -197,27 +213,17 @@ Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
 End Sub
 ```
 ```VBA
-Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
-    MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
-End Sub
-```
-```VBA
-Sub CountReferences()
-    MsgBox "Number of References: " & ActiveDocument.Bibliography.Sources.Count
-End Sub
-```
-```VBA
-Sub CountCitations() 'Number of times the references are actually cited
+Sub CountCitationsAndReferences()
     Application.ScreenUpdating = False 'This improves performance
 
-    Dim c As Integer: c = 0
+    Dim c, r As Integer: c = 0: r = ActiveDocument.Bibliography.Sources.Count '#References = Length of Bibliography
     Dim flds As Fields: Set flds = ActiveDocument.Fields
     For Each fld In flds
         If fld.Type = wdFieldCitation Then
-            c = c + 1
+            c = c + 1 '#Citations = Occurances of citations throughout the document
         End If
     Next
-    MsgBox "Number of Citations: " & c
+    MsgBox "Number of Citations: " & c & vbCrLf & "Number of References: " & r & vbCrLf & "Citations/References Ratio: " & Round(c / r, 2)
 
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
