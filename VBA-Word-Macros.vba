@@ -146,14 +146,31 @@ Sub PasteAsText() '(Ctrl+Shift+V)
     Selection.PasteAndFormat (wdFormatPlainText) 'Selection.PasteSpecial DataType:=wdPasteText, but faster
 End Sub
 
-Sub ShowAllHeadingsInNavigationPane()
+Sub ShowHeadingsInNavigationPane()
     ActiveWindow.DocumentMap = True
+End Sub
+
+Sub SaveDocument()
+    ActiveDocument.Save
+End Sub
+
+Sub DocumentFolderPath() 'Where it's saved to
+    Dim p As String: p = ActiveDocument.Path
+    If p <> "" Then
+        MsgBox "Document Path: " & p
+    Else
+        MsgBox "This document hasn't been saved yet"
+    End If
 End Sub
 
 Sub TodaysDate()
     MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy")
-End Sub 'e.g. Thursday, October 24, 2024
+End Sub
 
+Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
+    MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
+End Sub
+'Note that I have 1 bookmark for every ToC besides the main ToC, so for me: #ToCs = #Bookmarks + 1. For you it might be different if you use bookmarks for other purposes as well.
 Sub CountToCs() '#Tables of Contents
     MsgBox "Number of Tables of Contents: " & ActiveDocument.TablesOfContents.Count
 End Sub
@@ -166,25 +183,17 @@ Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
     MsgBox "Number of Tables: " & ActiveDocument.Tables.Count
 End Sub
 
-Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
-    MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
-End Sub
-
-Sub CountReferences()
-    MsgBox "Number of References: " & ActiveDocument.Bibliography.Sources.Count
-End Sub
-
-Sub CountCitations() 'Number of times the references are actually cited
+Sub CountCitationsAndReferences()
     Application.ScreenUpdating = False 'This improves performance
 
-    Dim c As Integer: c = 0
+    Dim c, r As Integer: c = 0: r = ActiveDocument.Bibliography.Sources.Count '#References = Length of Bibliography
     Dim flds As Fields: Set flds = ActiveDocument.Fields
     For Each fld In flds
         If fld.Type = wdFieldCitation Then
-            c = c + 1
+            c = c + 1 '#Citations = Occurances of citations throughout the document
         End If
     Next
-    MsgBox "Number of Citations: " & c
+    MsgBox "Number of Citations: " & c & vbCrLf & "Number of References: " & r & vbCrLf & "Citations/References Ratio: " & Round(c / r, 2)
 
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
@@ -192,7 +201,7 @@ End Sub
 Sub CountCrossReferences()
     Application.ScreenUpdating = False 'This improves performance
 
-    Dim c As Long: c = 0
+    Dim c As Integer: c = 0
     Dim flds As Fields: Set flds = ActiveDocument.Fields
     For Each fld In flds
         If fld.Type = wdFieldRef Then
