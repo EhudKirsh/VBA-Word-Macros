@@ -207,6 +207,22 @@ Sub CountReferences()
 End Sub
 ```
 ```VBA
+Sub CountCitations() 'Number of times the references are actually cited
+    Application.ScreenUpdating = False 'This improves performance
+
+    Dim c As Integer: c = 0
+    Dim flds As Fields: Set flds = ActiveDocument.Fields
+    For Each fld In flds
+        If fld.Type = wdFieldCitation Then
+            c = c + 1
+        End If
+    Next
+    MsgBox "Number of Citations: " & c
+
+    Application.ScreenUpdating = True 'Re-enable screen updating
+End Sub
+```
+```VBA
 Sub CountCrossReferences()
     Application.ScreenUpdating = False 'This improves performance
 
