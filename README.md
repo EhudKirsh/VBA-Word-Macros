@@ -170,32 +170,9 @@ Techinically, PasteAsText can be set to be the default paste in the Options, but
 1) Add this macro to the Quick Access Toolbar with the 3 steps above. I use the clipboard 📋 symbol and 'PasteAsText (Ctrl+Shift+V)' Display name.
 2) Now click on 'Customize Ribbon' in the Options -> 'Keyboard shortcuts: Cus<ins>t</ins>omize...' -> <ins>C</ins>ategories: 'Macros' -> Click on the macro on the right you want to assign a shortcut hot key to, PasteAsText in this case -> Look at 'C<ins>u</ins>rrent keys:' to see what the current shortcut hot keys are for it, but if it's empty or not to your liking, record your new shortcut hot keys by clicking on 'Press <ins>n</ins>ew shortcut key:', I use Ctrl+Shift+V -> <ins>A</ins>ssign -> Close & OK
 ---
-More small interesting and useful macros:
-```VBA
-Sub ShowHeadingsInNavigationPane()
-    ActiveWindow.DocumentMap = True
-End Sub
-```
-```VBA
-Sub SaveDocument()
-    ActiveDocument.Save
-End Sub
-```
-```VBA
-Sub DocumentFolderPath() 'Where it's saved to
-    Dim p As String: p = ActiveDocument.Path
-    If p <> "" Then
-        MsgBox "Document Path: " & p
-    Else
-        MsgBox "This document hasn't been saved yet"
-    End If
-End Sub
-```
-```VBA
-Sub TodaysDate()
-    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy")
-End Sub 'e.g. Thursday, October 24, 2024
-```
+<ins>More small interesting and useful macros:</ins>
+
+Counters:
 ```VBA
 Sub CountImages()
     Dim i, f As Integer 'i = inlineImages, f = floatingImages
@@ -203,32 +180,31 @@ Sub CountImages()
     i = ActiveDocument.InlineShapes.Count: f = ActiveDocument.Shapes.Count
 
     MsgBox "Inline Images: " & i & vbCrLf & _
-           "Floating Images: " & f & vbCrLf & _
-           "Total Images: " & i + f
+           "Floating Images: " & f & vbCrLf & "Total Images: " & i + f
 End Sub
-```
-```VBA
+
 Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
     MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
 End Sub
-```
-```VBA
-'Note that I have 1 bookmark for every ToC besides the main ToC, so for me: #ToCs = #Bookmarks + 1. For you it might be different if you use bookmarks for other purposes as well.
+
 Sub CountToCs() '#Tables of Contents
     MsgBox "Number of Tables of Contents: " & ActiveDocument.TablesOfContents.Count
 End Sub
-```
-```VBA
+'Note that I have 1 bookmark for every ToC besides the main ToC, so for me: #ToCs = #Bookmarks + 1.
+'For you it might be different if you use bookmarks for other purposes as well.
+
 Sub CountToFs() '#Tables of Figures
     MsgBox "Number of Tables of Figures: " & ActiveDocument.TablesOfFigures.Count
 End Sub
-```
-```VBA
+
 Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
     MsgBox "Number of Tables: " & ActiveDocument.Tables.Count
 End Sub
-```
-```VBA
+
+Sub CountFields() 'Including field codes, but not only
+    MsgBox "Number of Fields: " & ActiveDocument.Fields.Count
+End Sub
+
 Sub CountCitationsAndReferences()
     Application.ScreenUpdating = False 'This improves performance
 
@@ -241,12 +217,12 @@ Sub CountCitationsAndReferences()
             c = c + 1 '#Citations = Occurances of citations throughout the document
         End If
     Next
-    MsgBox "Number of Citations: " & c & vbCrLf & "Number of References: " & r & vbCrLf & "Citations/References Ratio: " & Round(c / r, 2)
+    MsgBox "Number of Citations: " & c & vbCrLf & "Number of References: " & _
+    r & vbCrLf & "Citations/References Ratio: " & Round(c / r, 2)
 
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
-```
-```VBA
+
 Sub CountCrossReferences()
     Application.ScreenUpdating = False 'This improves performance
 
@@ -261,13 +237,7 @@ Sub CountCrossReferences()
 
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
-```
-```VBA
-Sub CountFields() 'Including field codes, but not only
-    MsgBox "Number of Fields: " & ActiveDocument.Fields.Count
-End Sub
-```
-```VBA
+
 Sub CountHyperlinksURLs()
     Application.ScreenUpdating = False 'This improves performance
 
@@ -283,4 +253,30 @@ Sub CountHyperlinksURLs()
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
 ```
-Note that screen updating is only disabled in subs and functions that are not instant.
+Note that screen updating is only disabled in subs and functions that are not instant-quick.
+
+Non-Counters, Other MsgBox:
+```VBA
+Sub TodaysDate()
+    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy")
+End Sub
+
+Sub DocumentFolderPath() 'Where it's saved to
+    Dim p As String: p = ActiveDocument.Path
+    If p <> "" Then
+        MsgBox "Document Path: " & p
+    Else
+        MsgBox "This document hasn't been saved yet"
+    End If
+End Sub
+```
+Non-MsgBox:
+```VBA
+Sub SaveDocument()
+    ActiveDocument.Save
+End Sub
+
+Sub ShowHeadingsInNavigationPane()
+    ActiveWindow.DocumentMap = True
+End Sub
+```
