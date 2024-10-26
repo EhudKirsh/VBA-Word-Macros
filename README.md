@@ -197,6 +197,17 @@ Sub TodaysDate()
 End Sub 'e.g. Thursday, October 24, 2024
 ```
 ```VBA
+Sub CountImages()
+    Dim i, f As Integer 'i = inlineImages, f = floatingImages
+
+    i = ActiveDocument.InlineShapes.Count: f = ActiveDocument.Shapes.Count
+
+    MsgBox "Inline Images: " & i & vbCrLf & _
+           "Floating Images: " & f & vbCrLf & _
+           "Total Images: " & i + f
+End Sub
+```
+```VBA
 Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
     MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
 End Sub
@@ -221,7 +232,9 @@ End Sub
 Sub CountCitationsAndReferences()
     Application.ScreenUpdating = False 'This improves performance
 
-    Dim c, r As Integer: c = 0: r = ActiveDocument.Bibliography.Sources.Count '#References = Length of Bibliography
+    Dim c, r As Integer: c = 0: r = ActiveDocument.Bibliography.Sources.Count
+    '#References = Length of current list of sources or updated Bibliography
+
     Dim flds As Fields: Set flds = ActiveDocument.Fields
     For Each fld In flds
         If fld.Type = wdFieldCitation Then
