@@ -141,31 +141,14 @@ Sub UpdateTablesOfFiguresAndContents()
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
 
+'---------------------------------------------HotKeys Shortcuts---------------------------------------------
+
 Sub PasteAsText() '(Ctrl+Shift+V)
     On Error Resume Next 'Prevent an error and simply do nothing in case of an empty clipboard or image
     Selection.PasteAndFormat (wdFormatPlainText) 'Selection.PasteSpecial DataType:=wdPasteText, but faster
 End Sub
 
-Sub ShowHeadingsInNavigationPane()
-    ActiveWindow.DocumentMap = True
-End Sub
-
-Sub SaveDocument()
-    ActiveDocument.Save
-End Sub
-
-Sub DocumentFolderPath() 'Where it's saved to
-    Dim p As String: p = ActiveDocument.Path
-    If p <> "" Then
-        MsgBox "Document Path: " & p
-    Else
-        MsgBox "This document hasn't been saved yet"
-    End If
-End Sub
-
-Sub TodaysDate()
-    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy")
-End Sub
+'---------------------------------------------Counters---------------------------------------------
 
 Sub CountImages()
     Dim i, f As Integer 'i = inlineImages, f = floatingImages
@@ -173,17 +156,18 @@ Sub CountImages()
     i = ActiveDocument.InlineShapes.Count: f = ActiveDocument.Shapes.Count
 
     MsgBox "Inline Images: " & i & vbCrLf & _
-           "Floating Images: " & f & vbCrLf & _
-           "Total Images: " & i + f
+           "Floating Images: " & f & vbCrLf & "Total Images: " & i + f
 End Sub
 
 Sub CountBookmarks() 'These allow forming custom TOCs for each chapter
     MsgBox "Number of Bookmarks: " & ActiveDocument.Bookmarks.Count
 End Sub
-'Note that I have 1 bookmark for every ToC besides the main ToC, so for me: #ToCs = #Bookmarks + 1. For you it might be different if you use bookmarks for other purposes as well.
+
 Sub CountToCs() '#Tables of Contents
     MsgBox "Number of Tables of Contents: " & ActiveDocument.TablesOfContents.Count
 End Sub
+'Note that I have 1 bookmark for every ToC besides the main ToC, so for me: #ToCs = #Bookmarks + 1.
+'For you it might be different if you use bookmarks for other purposes as well.
 
 Sub CountToFs() '#Tables of Figures
     MsgBox "Number of Tables of Figures: " & ActiveDocument.TablesOfFigures.Count
@@ -191,6 +175,10 @@ End Sub
 
 Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
     MsgBox "Number of Tables: " & ActiveDocument.Tables.Count
+End Sub
+
+Sub CountFields() 'Including field codes, but not only
+    MsgBox "Number of Fields: " & ActiveDocument.Fields.Count
 End Sub
 
 Sub CountCitationsAndReferences()
@@ -205,7 +193,8 @@ Sub CountCitationsAndReferences()
             c = c + 1 '#Citations = Occurances of citations throughout the document
         End If
     Next
-    MsgBox "Number of Citations: " & c & vbCrLf & "Number of References: " & r & vbCrLf & "Citations/References Ratio: " & Round(c / r, 2)
+    MsgBox "Number of Citations: " & c & vbCrLf & "Number of References: " & _
+    r & vbCrLf & "Citations/References Ratio: " & Round(c / r, 2)
 
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
@@ -225,10 +214,6 @@ Sub CountCrossReferences()
     Application.ScreenUpdating = True 'Re-enable screen updating
 End Sub
 
-Sub CountFields() 'Including field codes, but not only
-    MsgBox "Number of Fields: " & ActiveDocument.Fields.Count
-End Sub
-
 Sub CountHyperlinksURLs()
     Application.ScreenUpdating = False 'This improves performance
 
@@ -242,4 +227,29 @@ Sub CountHyperlinksURLs()
     MsgBox "Number of Hyperlinks URLs: " & c
 
     Application.ScreenUpdating = True 'Re-enable screen updating
+End Sub
+
+'---------------------------------------------Non-Counters, Other MsgBox---------------------------------------------
+
+Sub TodaysDate()
+    MsgBox "Today's date is: " & Format(Date, "dddd, mmmm d, yyyy")
+End Sub
+
+Sub DocumentFolderPath() 'Where it's saved to
+    Dim p As String: p = ActiveDocument.Path
+    If p <> "" Then
+        MsgBox "Document Path: " & p
+    Else
+        MsgBox "This document hasn't been saved yet"
+    End If
+End Sub
+
+'---------------------------------------------Non-MsgBox---------------------------------------------
+
+Sub SaveDocument()
+    ActiveDocument.Save
+End Sub
+
+Sub ShowHeadingsInNavigationPane()
+    ActiveWindow.DocumentMap = True
 End Sub
