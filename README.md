@@ -32,7 +32,6 @@ Sub StyleBibliography()
     'Style the Bibliography References Table: turn http into hyperlinks, adjust columns widths and align text to the left
     Dim T As Table: Set T = FindBibliography: T.AllowAutoFit = False
     Dim httpPos, spacePos, refs As Integer: Dim cols, C2 As Object
-
     Set cols = T.columns: Set C2 = cols(2)
 
     refs = ActiveDocument.Bibliography.Sources.Count
