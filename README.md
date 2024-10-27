@@ -2,10 +2,12 @@ In Microsoft Word, to update all references and cross references, typically peop
 <!-- To Do: Add 2 screenshots here: TOC & Table of Figures -->
 The purpose of this VBA Macro is to update all of these automatically with a single click without any window like this poping up. Specifically, it updates all of the following:
 
-- All Caption Labels (equations, figures and tables by default, but also custom)
-- All Cross-References, including of the above caption labels, but also of headings
-- All References
-- All Tables of Contents, Tables of Figures and Bibliography References Table
+- Caption Labels - equations, figures and tables by default, but also custom
+- Cross-References, including of the above caption labels, but also of headings
+- Citations [#]
+- Tables of Figures (of Caption Labels)
+- Tables of Contents, with custom indentations for different levels of headings
+- Bibliography References Table, aligning text to the left, fit widths of cols, HyperLink URLs 🔗, and display typically hidden details like DOI
 ```VBA
 Sub UpdateAll()
     Application.ScreenUpdating = False 'This improves performance
@@ -29,15 +31,19 @@ Sub StyleBibliography()
 
     'Style the Bibliography References Table: turn http into hyperlinks, adjust columns widths and align text to the left
     Dim T As Table: Set T = FindBibliography: T.AllowAutoFit = False
-    Dim httpPos, spacePos As Integer: Dim cols, C2 As Object
+    Dim httpPos, spacePos, refs As Integer: Dim cols, C2 As Object
 
     Set cols = T.columns: Set C2 = cols(2)
 
-    'Optional - pick how many digits of references you have:
-    'cols(1).Width = 17 ': C2.Width = 420 '[9]
-    'cols(1).Width = 22 ': C2.Width = 415 '[99]
-    cols(1).Width = 30 ': C2.Width = 407 '[999]
-
+    refs = ActiveDocument.Bibliography.Sources.Count
+    'Width of 1st col based on how many digits of references you have:
+    If refs <= 9 Then '[9]
+        cols(1).Width = 17 ': C2.Width = 420
+    ElseIf refs <= 99 Then '[99]
+        cols(1).Width = 22 ': C2.Width = 415
+    Else '[999]
+        cols(1).Width = 30 ': C2.Width = 407
+    End If
     C2.AutoFit 'Width
 
     Dim CellsRange As Cells: Set CellsRange = C2.Cells
@@ -276,7 +282,11 @@ Sub SaveDocument()
     ActiveDocument.Save
 End Sub
 
-Sub ShowHeadingsInNavigationPane()
-    ActiveWindow.DocumentMap = True
+Sub ToggleShowHeadingsNavigationPane()
+    If ActiveWindow.DocumentMap Then
+        ActiveWindow.DocumentMap = False
+    Else
+        ActiveWindow.DocumentMap = True
+    End If
 End Sub
 ```
