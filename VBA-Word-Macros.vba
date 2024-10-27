@@ -20,15 +20,18 @@ Sub StyleBibliography()
 
     'Style the Bibliography References Table: turn http into hyperlinks, adjust columns widths and align text to the left
     Dim T As Table: Set T = FindBibliography: T.AllowAutoFit = False
-    Dim httpPos, spacePos As Integer: Dim cols, C2 As Object
-
+    Dim httpPos, spacePos, refs As Integer: Dim cols, C2 As Object
     Set cols = T.columns: Set C2 = cols(2)
 
-    'Optional - pick how many digits of references you have:
-    'cols(1).Width = 17 ': C2.Width = 420 '[9]
-    'cols(1).Width = 22 ': C2.Width = 415 '[99]
-    cols(1).Width = 30 ': C2.Width = 407 '[999]
-
+    refs = ActiveDocument.Bibliography.Sources.Count
+    'Width of 1st col based on how many digits of references you have:
+    If refs <= 9 Then '[9]
+        cols(1).Width = 17 ': C2.Width = 420
+    ElseIf refs <= 99 Then '[99]
+        cols(1).Width = 22 ': C2.Width = 415
+    Else '[999]
+        cols(1).Width = 30 ': C2.Width = 407
+    End If
     C2.AutoFit 'Width
 
     Dim CellsRange As Cells: Set CellsRange = C2.Cells
@@ -250,6 +253,10 @@ Sub SaveDocument()
     ActiveDocument.Save
 End Sub
 
-Sub ShowHeadingsInNavigationPane()
-    ActiveWindow.DocumentMap = True
+Sub ToggleShowHeadingsNavigationPane()
+    If ActiveWindow.DocumentMap Then
+        ActiveWindow.DocumentMap = False
+    Else
+        ActiveWindow.DocumentMap = True
+    End If
 End Sub
