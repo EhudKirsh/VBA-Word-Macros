@@ -176,6 +176,39 @@ Sub CountToFs() '#Tables of Figures
     MsgBox "Number of Tables of Figures: " & ActiveDocument.TablesOfFigures.Count
 End Sub
 
+Sub CountCaptionLabels()
+    Application.ScreenUpdating = False 'This improves performance
+ 
+    Dim i, Total, LabelsCount As Integer
+    Total = 0: LabelsCount = CaptionLabels.Count
+    Dim obj: Set obj = CreateObject("Scripting.Dictionary")
+    Dim Name, Msg As String: Msg = ""
+
+    For i = 1 To LabelsCount
+        obj.Add CaptionLabels(i).Name, 0
+    Next
+
+    Dim fld, flds As Fields: Set flds = ActiveDocument.Fields
+    For Each fld In flds
+        If fld.Type = wdFieldSequence Then
+            Total = Total + 1
+            Name = Trim(Split(fld.Code.Text, " ")(2))
+            obj(Name) = obj(Name) + 1
+        End If
+    Next
+
+    i = 0
+    For Each Name In obj.keys
+        i = i + 1
+        Msg = Msg & i & ") " & Name & ": " & obj(Name) & vbCrLf
+    Next
+
+    MsgBox "Number of Labels: " & LabelsCount & vbCrLf & vbCrLf & _
+        Msg & vbCrLf & "Total Number of Captions: " & Total
+
+    Application.ScreenUpdating = True 'Re-enable screen updating
+End Sub
+
 Sub CountTables() '#Tables, excluding ToCs & ToFs, but includes Bibliography
     MsgBox "Number of Tables: " & ActiveDocument.Tables.Count
 End Sub
@@ -249,14 +282,24 @@ End Sub
 
 '---------------------------------------------Non-MsgBox---------------------------------------------
 
-Sub SaveDocument()
+Sub SaveDocument() 'To Do: make this into atuo-save on close & after every edit change
     ActiveDocument.Save
 End Sub
+
+'---------------------------------------------ToggleShow---------------------------------------------
 
 Sub ToggleShowHeadingsNavigationPane()
     If ActiveWindow.DocumentMap Then
         ActiveWindow.DocumentMap = False
     Else
         ActiveWindow.DocumentMap = True
+    End If
+End Sub
+
+Sub ToggleShowFieldCodes() 'Alt + F9
+    If ActiveWindow.View.ShowFieldCodes Then
+        ActiveWindow.View.ShowFieldCodes = False
+    Else
+        ActiveWindow.View.ShowFieldCodes = True
     End If
 End Sub
