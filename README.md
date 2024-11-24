@@ -13,7 +13,7 @@ Sub UpdateAll()
     Application.ScreenUpdating = False 'This improves performance
 
     'Firstly hide the field codes so Word doesn't need to update their display
-    ActiveWindow.View.ShowFieldCodes = False 'Alt + F9
+    ActiveWindow.View.ShowFieldCodes = False 'AltLeft + F9
 
     'Update all fields in the document, including references, cross references & caption labels
     ActiveDocument.Fields.Update
@@ -156,7 +156,7 @@ Sub UpdateTablesOfFiguresAndContents()
 End Sub
 ```
 <ins>Steps to use these macros in Word:</ins>
-1) Open the 'Microsoft Visual Basic for Applications' window by pressing Alt+F11 OR click on 'Developer' tab & 'Visual Basic' under 'Code' -> click on 'Insert' -> 'Module' -> copy the above macros and paste into this module -> Save by pressing Ctrl+S OR Click on the Save icon 💾
+1) Open the 'Microsoft Visual Basic for Applications' window by pressing AltLeft + F11 OR click on 'Developer' tab & 'Visual Basic' under 'Code' -> click on 'Insert' -> 'Module' -> copy the above macros and paste into this module -> Save by pressing Ctrl+S OR Click on the Save icon 💾
 2) Run them to check they work by pressing F5 OR clicking on the Run icon ▷ when the caret stands on whichever macro you'd like to test
 3) Add the UpdateAll macro to the Quick Access Toolbar: click on 'File' -> 'Options' -> 'Quick Access Toolbar' -> '<ins>C</ins>hoose commands from:' -> 'Macros' -> click on the macro you created -> '<ins>A</ins>dd >>' -> click on this macro that you just added to the right -> '<ins>M</ins>odify...' -> Pick a nice Display name and icon, I like 'UpdateAll' and the update document symbol 📄🔄 -> OK & OK
 Now by simply clicking on this icon at the top left on your screen runs this macro every time. You can also run it with a custom hotkey sequence in the 'Customize Ribbon' tab in the 'Options' next to the 'Quick Access Toolbar', but I didn't bother with it.
@@ -324,7 +324,7 @@ Sub ToggleShowHeadingsNavigationPane()
     End If
 End Sub
 
-Sub ToggleShowFieldCodes() 'Alt + F9
+Sub ToggleShowFieldCodes() 'AltLeft + F9
     If ActiveWindow.View.ShowFieldCodes Then
         ActiveWindow.View.ShowFieldCodes = False
     Else
